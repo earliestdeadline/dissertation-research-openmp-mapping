@@ -175,6 +175,9 @@
 \RequirePackage[dvipsnames]{xcolor} % Required for extra color names
 
 \RequirePackage{booktabs} % Required for better table rules
+\AddToHook{env/tabular/begin}{\small}
+\AddToHook{env/tabularx/begin}{\small}
+\AddToHook{env/longtable/begin}{\small}
 
 \RequirePackage{lmodern} % AMB: Latin Modern Roman for the text body (if needed serif font).
 
