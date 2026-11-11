@@ -5,106 +5,75 @@
 
 
 %-------------------------------------------------------------------------------
-%---------
-%
-\section{Writing guidelines}
-\label{sec:chap1_guidelines} %For referencing this section elsewhere, use Section~\ref{sec:chap1_guidelines}
+\section{Background and motivation}
+\label{sec:chap1_background}
 
-This chapter presents some recommendations to follow in the structuring and formatting of the dissertation research plan.
+Real-time systems perform computing activities that must complete within specified time constraints. In these systems, a correct result delivered after its deadline can be as unusable as an incorrect one, so timing behaviour is a requirement in its own right. Developers therefore need to analyse execution before deployment and establish whether the system can meet its timing requirements, including under worst-case conditions.
 
-The purpose of writing a research plan is, in essence, to document the work developed and highlight its importance. The author must follow the best writing rules, that is, respect grammatical and spelling rules, and correctly organize the text in order to make the message to be conveyed clear.
+\subsection{Cyber-physical, safety-critical and parallel systems}
+\label{sec:chap1_cps}
 
-The language used must be rigorous, scientific and without colloquial expressions. If in Portuguese, the document must be written using the rules of the new Orthographic Agreement that took effect in January 2009. If in English, the document should follow the rules of the United Kingdom variant.
+Cyber-physical systems couple computation with physical processes, so the timing of sensing, processing and actuation affects the physical system. The accelerator-mapping work that motivates this thesis frames such systems as needing to process large volumes of data under latency and determinism constraints \parencite[p.~1]{Samadi2026Accelerator}. Concurrent AI and machine-learning workloads on shared GPUs and embedded accelerators are a motivating case for both real-time GPU scheduling \parencite{Zou2023RTGPU} and embedded inference \parencite{Dagli2024HaXCoNN}.
 
-Automatic spelling correction must be complemented by consulting grammars and glossaries.
+Safety-critical domains, such as automotive, have traditionally favoured static allocation, in which task placement is fixed before execution, because the resulting arrangement can be analysed in advance \parencite[PDF~p.~1]{Melani2017StaticOpenMP}. Parallel platforms make this harder: OpenMP lets programmers express work as a directed acyclic graph (DAG) of tasks and dependencies \parencite[p.~2]{Samadi2026Accelerator}, and tied tasks under a dynamic runtime scheduler are difficult to analyse tightly \parencite[PDF~p.~1]{Melani2017StaticOpenMP}.
 
+\subsection{Static and dynamic scheduling}
+\label{sec:chap1_static_dynamic}
 
-% -----------------------------------------------------------------------------
-% DOCUMENT STRUCTURE
-% -----------------------------------------------------------------------------
-\section{Document structure}
+In static approaches, task placement is decided before execution, which makes the arrangement known and analysable. In dynamic approaches, the runtime decides placement while the application runs. This can respond to the work actually present, but is harder to bound in advance. The expectation that static mapping is always more predictable has been challenged on CPUs. In OpenMP experiments on an NVIDIA Jetson AGX Xavier, dynamic mapping gave lower response time and variability than a recorded static mapping for DAGs with dependencies, while the two performed alike for independent tasks \parencite[pp.~113, 117]{Samadi2024StaticDynamic}. The static variant there replays a schedule recorded from a dynamic run, not an analytically optimised allocation, and the study covered one application on the CPU only. Whether the same holds for accelerator offloading has not been established \parencite[p.~6]{Samadi2026Accelerator}.
 
-The structure of the dissertation is normally divided into three main parts: Introduction, State of the art and Research Plan.
+\subsection{Related work in brief}
+\label{sec:chap1_related_brief}
 
-The Introduction should contain the following subsections:
-\begin{itemize}
-  \item Background and Motivation (context, relevance and motivation)
-  \item Problem Statement (the problem, gaps and definition of scope)
-  \item Goal and Objectives (the main goal and its measurable objectives)
-  \item Research Questions (the questions that will guide the research)
-  \item Privacy and Ethics (see Section 1.4)
-  \item Use of AI Tools (see Section 1.5)
-  \item Document Structure (brief description of the following chapters)
-\end{itemize}
+Several works address this problem from complementary directions. Melani et al.\ \textcite{Melani2017StaticOpenMP} proposed static allocation of OpenMP DAGs using an ILP reference and fast heuristics, but the evaluation is offline, single-DAG and CPU-only. Samadi et al.\ \textcite{Samadi2024TaskToThread} introduced heuristic multi-queue task-to-thread mapping with an LLVM implementation, restricted to CPU threads. Samadi et al.\ \textcite{Samadi2026Schedulability} analysed the schedulability of these mappings, but reported only single DAGs because schedulability for multiple DAGs was very low. Serrano and Qui{\~n}ones \textcite{Serrano2018HeterogeneousRTA} derived an analytical response-time bound for a DAG with one offloaded node, but on a single accelerator. Yang et al.\ \textcite{Yang2018OpenVX} analysed six concurrent computer-vision DAGs on CPU and GPU with bounds and measurements, but without OpenMP. Zou et al.\ \textcite{Zou2023RTGPU} provide hard real-time analysis for multiple GPU applications with hardware validation, but use CUDA and chain-structured tasks. Yu et al.\ \textcite{Yu2024OpenMPGPUGraph} run OpenMP GPU graphs on H100 and Jetson Orin systems, but report throughput rather than predictability. Dagli and Belviranli \textcite{Dagli2024HaXCoNN} map concurrent DNNs onto the GPU and DLA of Jetson platforms, but their objective is throughput and latency rather than deadlines.
 
-The main Body of the document includes the survey of the state of the art carried out, normally placed in the chapter following the Introduction. The survey of the state of the art should not be too exhaustive, focusing on the specific topics addressed in the document. This state of the art is intended to be updated during the writing of the dissertation. The structure of this chapter should be discussed with the supervisor.
+\section{Problem statement and scope}
+\label{sec:chap1_problem}
 
-An optional chapter can be added, with initial work already performed, such as a proposed approach and/or preliminary results.
+Task mapping decides where and when ready tasks run. For OpenMP applications that offload work to GPUs, it also determines how device queues are filled, and therefore response time and its variation \parencite[p.~1]{Samadi2026Accelerator}. Heuristic mapping has been studied for CPU threads \parencite{Samadi2024TaskToThread} and, in simulation, for single DAGs on accelerators \parencite{Samadi2026Accelerator}. In the sources reviewed so far, concurrent DAGs on heterogeneous OpenMP platforms receive little direct evidence. The accelerator method evaluates single DAGs and mentions that multiple DAGs could be considered only if executed sequentially \parencite[p.~3]{Samadi2026Accelerator}, and the group's CPU-only multi-DAG analysis found very low schedulability \parencite[p.~2:8]{Samadi2026Schedulability}.
 
-Finally, a Research Plan chapter needs to be provided, with information on the work to be performed during the 2\textsuperscript{nd} semester.
+The thesis therefore treats three gaps as working hypotheses to test, not as established absences:
+\begin{enumerate}
+  \item \textbf{G1:} concurrently released OpenMP target-task DAGs, mapped to heterogeneous CPU and GPU resources and measured on hardware for response time and variability;
+  \item \textbf{G2:} real-hardware evaluation of a candidate accelerator mapping on high-workload AI and computer-vision-style applications;
+  \item \textbf{G3:} a comparison of static and dynamic accelerator mapping, including its overhead, which has been studied for CPU threads \parencite{Samadi2024StaticDynamic} but not for accelerators.
+\end{enumerate}
+The search is bounded. Contrary evidence exists for concurrent computer-vision and DNN workloads \parencite{Yang2018OpenVX,Dagli2024HaXCoNN} and for OpenMP GPU execution on embedded and HPC platforms \parencite{Yu2024OpenMPGPUGraph}, so the thesis must position itself narrowly, within OpenMP and accelerator mapping.
 
-\begin{itemize}
-  \item the methodology of the work to be developed (summary of the approach, methods, prototypes, experimentation, etc.);
-  \item how the results are going to be evaluated to allow the research questions to be answered;
-  \item timeline of activities for the second semester.
-\end{itemize}
+Platform choice is itself an open problem. The candidate method was evaluated by simulation, using task times traced on a single-GPU embedded board, while its multi-GPU configurations are hypothetical \parencite[pp.~7--9]{Samadi2026Accelerator}. On a single integrated GPU, the device-allocation phase has no real choice to make, whereas a multi-GPU node exercises all three phases. NVIDIA hardware is the likely target, but the board, GPU count and access are not confirmed. Embedded Jetson-class boards are the platform used in the group's earlier work \parencite{Samadi2024StaticDynamic} and in concurrent DNN studies \parencite{Dagli2024HaXCoNN}. A server-class node, such as the four-H100 accelerator node used by Yu et al., gives more devices but may not be available \parencite[p.~6]{Yu2024OpenMPGPUGraph}. The choice affects both what can be tested and how results compare with the literature.
 
-\subsection{Contents checklist}
+\section{Goal and objectives}
+\label{sec:chap1_goal}
 
-Table~\ref{tab:checklist} provides a list to check the contents of the document.
+\textit{[Proposed; to be confirmed by the author.]}
 
-\begin{table}[H]
-  \caption{Contents checklist.}
-  \label{tab:checklist}
-  \centering
-  \begin{tabular}{l l l}
-    \toprule
-    \tabhead{Description}            & \tabhead{Mandatory?} & \tabhead{Page numbers} \\
-    \midrule
-    First page (template first page) & Yes                  & None                   \\
-    Statement of Integrity           & Yes                  & Roman                  \\
-    Portuguese abstract (Resumo)     & Yes                  & Roman                  \\
-    English abstract                 & Yes                  & Roman                  \\
-    Table of Contents                & Yes                  & Roman                  \\
-    List of Figures                  & Yes                  & Roman                  \\
-    List of Tables                   & Yes                  & Roman                  \\
-    Acronyms and Symbols             & Yes                  & Roman                  \\
-    Introduction                     & Yes                  & Arabic                 \\
-    State of the art                 & Yes                  & Arabic                 \\
-    Preliminary Results              & No                   & Arabic                 \\
-    Research Plan                    & Yes                  & Arabic                 \\
-    References                       & Yes                  & Arabic                 \\
-    Annexes and appendices           & No                   & Arabic                 \\
+The goal is to determine whether a predictable task-to-accelerator mapping for OpenMP applications on heterogeneous CPU and GPU platforms can be implemented and evaluated on high-workload applications, and how its mapping choices affect response time and its variability. The objectives are to:
+\begin{enumerate}
+  \item review and map the state of the art on mapping, scheduling and GPU offloading, with explicit screening criteria;
+  \item implement or adapt a candidate heuristic family on an available platform, verifying correctness before measurement;
+  \item evaluate it under concurrent DAG release and against static and dynamic variants, reporting observed maxima, variability and mapping overhead;
+  \item report what the measurements show and do not show, separating empirical observations from analytical guarantees.
+\end{enumerate}
 
-    \bottomrule                                                                      \\
-  \end{tabular}
-\end{table}
+\section{Research questions}
+\label{sec:chap1_questions}
 
+\textit{[Proposed; to be confirmed by the author.]}
 
-% -----------------------------------------------------------------------------
-% FORMATTING
-% -----------------------------------------------------------------------------
-\section{Formatting}
+\begin{enumerate}
+  \item \textbf{RQ1 (G1):} How does the response time of several concurrently released OpenMP target-task DAGs change under a candidate heuristic mapping, compared with a baseline?
+  \item \textbf{RQ2 (G2):} Do the candidate heuristics keep their simulated advantage when run on real hardware with AI and computer-vision-style workloads?
+  \item \textbf{RQ3 (G3):} How do static and dynamic accelerator mapping compare in response-time variability and mapping overhead?
+\end{enumerate}
 
-The document can be written in Portuguese or English. The minimum number of pages is 30 and the maximum is 60. Complementary documentation may be added in the form of annexes, never exceeding 90 pages in total (including the main text of the dissertation).
+Observed maximum response times are not WCRT bounds, and deadline misses are not schedulability guarantees. The thesis will state its predictability claims within that limit.
 
-Please follow the margins and fonts  defined in this template. The font size should be 11pt. The document should be printed double sided.
-
-Please note that the graphic appearance and formatting are not a substitute for well-organized writing and a clear presentation of ideas.
-
-Please refer to the annex~\ref{AppendixA} for details about this template, how to format the document and insert citations, figures, tables, equations and other elements.
-
-
-% -----------------------------------------------------------------------------
-% PRIVACY AND ETHICS
-% -----------------------------------------------------------------------------
 \section{Privacy and ethics}
 The document is required to provide in the introduction chapter a specific section with information on how privacy and ethics were considered in the analysis and development of the work. If not applicable, this should be justified.  Without this section, the document will not be evaluated.
 
 
-% -----------------------------------------------------------------------------
-% USE OF AI TOOLS
-% -----------------------------------------------------------------------------
+\textit{[Author to complete. The template requires this section. State how privacy and ethics were considered, or justify why they are not applicable.]}
+
 \section{Use of AI tools}
 The dissertation course uses the model of limited use with declaration of use and intentions~\parencite{oliveira2025}. AI tools can be used, under supervision, to support the development of the work, such as idea generation, topic organization, document structure, brainstorming and linguistic revision. All content needs to be revised, and the author needs to add a statement taking full responsibility for the work.
 
@@ -123,7 +92,7 @@ The following tables provide an example of summary tables that can be included i
     Application                  & Model                    & Version                           \\
     \midrule
     ChatGPT (via chatgpt.com)    & GPT-4o                   & Several versions since 2026-01-01 \\
-    GitHub Copilot (via VS Code) & GPT-4o, Claude Haiku 4.5 & 1.134                             \\
+    GitHub Copilot (via VS Code) & Claude Sonnet 5.5          & 1.134                             \\
     llama.cpp                    & Gemma 4                  & E4B                               \\
     \bottomrule
   \end{tabularx}
@@ -153,8 +122,17 @@ The following tables provide an example of summary tables that can be included i
     Models were used to propose grammar corrections and text simplification.                                                                                                                                                               \\
 
     All                 &
-    Models were used to verify the correctness and completeness of bibliography and cross-references.                                                                                                                                      \\
+    Claude Sonnet 5.5 via GitHub Copilot was used for document gathering, general research, and checking document cross-references.                                                                                                         \\
     \bottomrule
   \end{tabularx}
 \end{table}
+
+\textit{[Author to complete. The template requires this section. List each AI tool used, its purpose and the chapters affected, and confirm the applicable institutional policy.]}
+
+\section{Document structure}
+\label{sec:chap1_structure}
+
+Chapter~\ref{chap:Chapter2} reviews the state of the art on mapping and scheduling OpenMP tasking graphs and on the analysis of GPU-based systems, and identifies the gaps. Chapter~\ref{chap:Chapter3} is optional and presents the proposed approach and its justification in terms of those gaps. Chapter~\ref{chap:Chapter4} sets out the research plan, the methodology, the evaluation and the timeline.
+
+
 
