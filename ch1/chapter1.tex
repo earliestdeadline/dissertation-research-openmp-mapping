@@ -13,14 +13,14 @@ Real-time systems perform computing activities that must complete within specifi
 \subsection{Cyber-physical, safety-critical and parallel systems}
 \label{sec:chap1_cps}
 
-Cyber-physical systems couple computation with physical processes, so the timing of sensing, processing and actuation affects the physical system. The accelerator-mapping work that motivates this thesis frames such systems as needing to process large volumes of data under latency and determinism constraints \parencite[p.~1]{Samadi2026Accelerator}. Concurrent AI and machine-learning workloads on shared GPUs and embedded accelerators are a motivating case for both real-time GPU scheduling \parencite{Zou2023RTGPU} and embedded inference \parencite{Dagli2024HaXCoNN}.
+Cyber-physical systems couple computation with physical processes, so the timing of sensing, processing and actuation affects the physical system. The accelerator-mapping work that motivates this thesis frames such systems as needing to process large volumes of data under latency and determinism constraints {Samadi2026Accelerator}. Concurrent AI and machine-learning workloads on shared GPUs and embedded accelerators are a motivating case for both real-time GPU scheduling \parencite{Zou2023RTGPU} and embedded inference \parencite{Dagli2024HaXCoNN}.
 
-Safety-critical domains, such as automotive, have traditionally favoured static allocation, in which task placement is fixed before execution, because the resulting arrangement can be analysed in advance \parencite[PDF~p.~1]{Melani2017StaticOpenMP}. Parallel platforms make this harder: OpenMP lets programmers express work as a directed acyclic graph (DAG) of tasks and dependencies \parencite[p.~2]{Samadi2026Accelerator}, and tied tasks under a dynamic runtime scheduler are difficult to analyse tightly \parencite[PDF~p.~1]{Melani2017StaticOpenMP}.
+Safety-critical domains, such as automotive, have traditionally favoured static allocation, in which task placement is fixed before execution, because the resulting arrangement can be analysed in advance {Melani2017StaticOpenMP}. Parallel platforms make this harder: OpenMP lets programmers express work as a directed acyclic graph (DAG) of tasks and dependencies {Samadi2026Accelerator}, and tied tasks under a dynamic runtime scheduler are difficult to analyse tightly {Melani2017StaticOpenMP}.
 
 \subsection{Static and dynamic scheduling}
 \label{sec:chap1_static_dynamic}
 
-In static approaches, task placement is decided before execution, which makes the arrangement known and analysable. In dynamic approaches, the runtime decides placement while the application runs. This can respond to the work actually present, but is harder to bound in advance. The expectation that static mapping is always more predictable has been challenged on CPUs. In OpenMP experiments on an NVIDIA Jetson AGX Xavier, dynamic mapping gave lower response time and variability than a recorded static mapping for DAGs with dependencies, while the two performed alike for independent tasks \parencite[pp.~113, 117]{Samadi2024StaticDynamic}. The static variant there replays a schedule recorded from a dynamic run, not an analytically optimised allocation, and the study covered one application on the CPU only. Whether the same holds for accelerator offloading has not been established \parencite[p.~6]{Samadi2026Accelerator}.
+In static approaches, task placement is decided before execution, which makes the arrangement known and analysable. In dynamic approaches, the runtime decides placement while the application runs. This can respond to the work actually present, but is harder to bound in advance. The expectation that static mapping is always more predictable has been challenged on CPUs. In OpenMP experiments on an NVIDIA Jetson AGX Xavier, dynamic mapping gave lower response time and variability than a recorded static mapping for DAGs with dependencies, while the two performed alike for independent tasks {Samadi2024StaticDynamic}. The static variant there replays a schedule recorded from a dynamic run, not an analytically optimised allocation, and the study covered one application on the CPU only. Whether the same holds for accelerator offloading has not been established {Samadi2026Accelerator}.
 
 \subsection{Related work in brief}
 \label{sec:chap1_related_brief}
@@ -30,7 +30,7 @@ Several works address this problem from complementary directions. Melani et al.\
 \section{Problem statement and scope}
 \label{sec:chap1_problem}
 
-Task mapping decides where and when ready tasks run. For OpenMP applications that offload work to GPUs, it also determines how device queues are filled, and therefore response time and its variation \parencite[p.~1]{Samadi2026Accelerator}. Heuristic mapping has been studied for CPU threads \parencite{Samadi2024TaskToThread} and, in simulation, for single DAGs on accelerators \parencite{Samadi2026Accelerator}. In the sources reviewed so far, concurrent DAGs on heterogeneous OpenMP platforms receive little direct evidence. The accelerator method evaluates single DAGs and mentions that multiple DAGs could be considered only if executed sequentially \parencite[p.~3]{Samadi2026Accelerator}, and the group's CPU-only multi-DAG analysis found very low schedulability \parencite[p.~2:8]{Samadi2026Schedulability}.
+Task mapping decides where and when ready tasks run. For OpenMP applications that offload work to GPUs, it also determines how device queues are filled, and therefore response time and its variation  {Samadi2026Accelerator}. Heuristic mapping has been studied for CPU threads \parencite{Samadi2024TaskToThread} and, in simulation, for single DAGs on accelerators \parencite{Samadi2026Accelerator}. In the sources reviewed so far, concurrent DAGs on heterogeneous OpenMP platforms receive little direct evidence. The accelerator method evaluates single DAGs and mentions that multiple DAGs could be considered only if executed sequentially \parencite[p.~3]{Samadi2026Accelerator}, and the group's CPU-only multi-DAG analysis found very low schedulability \parencite[p.~2:8]{Samadi2026Schedulability}.
 
 The thesis therefore treats three gaps as working hypotheses to test, not as established absences:
 \begin{enumerate}
@@ -45,8 +45,6 @@ Platform choice is itself an open problem. The candidate method was evaluated by
 \section{Goal and objectives}
 \label{sec:chap1_goal}
 
-\textit{[Proposed; to be confirmed by the author.]}
-
 The goal is to determine whether a predictable task-to-accelerator mapping for OpenMP applications on heterogeneous CPU and GPU platforms can be implemented and evaluated on high-workload applications, and how its mapping choices affect response time and its variability. The objectives are to:
 \begin{enumerate}
   \item review and map the state of the art on mapping, scheduling and GPU offloading, with explicit screening criteria;
@@ -57,8 +55,6 @@ The goal is to determine whether a predictable task-to-accelerator mapping for O
 
 \section{Research questions}
 \label{sec:chap1_questions}
-
-\textit{[Proposed; to be confirmed by the author.]}
 
 \begin{enumerate}
   \item \textbf{RQ1 (G1):} How does the response time of several concurrently released OpenMP target-task DAGs change under a candidate heuristic mapping, compared with a baseline?
@@ -91,9 +87,9 @@ The following tables provide an example of summary tables that can be included i
     \toprule
     Application                  & Model                    & Version                           \\
     \midrule
-    ChatGPT (via chatgpt.com)    & GPT-4o                   & Several versions since 2026-01-01 \\
-    GitHub Copilot (via VS Code) & Claude Sonnet 5.5          & 1.134                             \\
-    llama.cpp                    & Gemma 4                  & E4B                               \\
+    ChatGPT (via chatgpt.com)    & GPT-6 Luna                   & Several versions since 2026-10-26 \\
+    GitHub Copilot (via VS Code) & Claude Sonnet 5.5          & Several versions since 2026-10-26                            \\
+    Overleaf & Internal Overleaf Model          & Several versions since 2026-11-09                        \\
     \bottomrule
   \end{tabularx}
 \end{table}
@@ -106,9 +102,6 @@ The following tables provide an example of summary tables that can be included i
     \toprule
     Chapter/Section     & Purpose                                                                                                                                                                                                          \\
     \midrule
-    Abstract, Structure &
-    Since the contents depend on, and can be inferred from, the rest of the document, models were used to generate the sections. However, all generated content has been critically reviewed to guarantee correctness.                     \\
-
     Introduction        &
     Research questions were brainstormed with the model. The final version is the result of the author's critical analysis of the brainstorm.                                                                                              \\
 
@@ -127,12 +120,12 @@ The following tables provide an example of summary tables that can be included i
   \end{tabularx}
 \end{table}
 
-\textit{[Author to complete. The template requires this section. List each AI tool used, its purpose and the chapters affected, and confirm the applicable institutional policy.]}
 
 \section{Document structure}
 \label{sec:chap1_structure}
 
-Chapter~\ref{chap:Chapter2} reviews the state of the art on mapping and scheduling OpenMP tasking graphs and on the analysis of GPU-based systems, and identifies the gaps. Chapter~\ref{chap:Chapter3} is optional and presents the proposed approach and its justification in terms of those gaps. Chapter~\ref{chap:Chapter4} sets out the research plan, the methodology, the evaluation and the timeline.
+\textbf{Chapter~\ref{chap:Chapter2}} reviews the state of the art on mapping and scheduling OpenMP tasking graphs and on the analysis of GPU-based systems, and identifies the gaps. 
+\textbf{Chapter~\ref{chap:Chapter3}} presents the proposed approach and its justification in terms of those gaps. \textbf{Chapter~\ref{chap:Chapter4}} delineates the research plan, the methodology, the evaluation, and the timeline.
 
 
 
