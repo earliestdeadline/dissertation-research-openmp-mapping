@@ -45,11 +45,12 @@ Platform choice is itself an open problem. The candidate method was evaluated by
 \section{Goal and objectives}
 \label{sec:chap1_goal}
 
-The goal is to determine whether a predictable task-to-accelerator mapping for OpenMP applications on heterogeneous CPU and GPU platforms can be implemented and evaluated on high-workload applications, and how its mapping choices affect response time and its variability. The objectives are to:
+The goal is to determine whether a predictable task-to-accelerator mapping for OpenMP applications on heterogeneous CPU and GPU platforms can be implemented and evaluated on high-workload applications, and how its mapping choices affect response time, its variability and schedulability. The objectives are to:
 \begin{enumerate}
   \item review and map the state of the art on mapping, scheduling and GPU offloading, with explicit screening criteria;
   \item implement or adapt a candidate heuristic family on an available platform, verifying correctness before measurement;
   \item evaluate it under concurrent DAG release and against static and dynamic variants, reporting observed maxima, variability and mapping overhead;
+  \item investigate and apply an appropriate schedulability analysis to the implemented mapping, stating its assumptions and limitations for the CPU and GPU workloads considered;
   \item report what the measurements show and do not show, separating empirical observations from analytical guarantees.
 \end{enumerate}
 
@@ -62,7 +63,7 @@ The goal is to determine whether a predictable task-to-accelerator mapping for O
   \item \textbf{RQ3 (G3):} How do static and dynamic accelerator mapping compare in response-time variability and mapping overhead?
 \end{enumerate}
 
-Observed maximum response times are not WCRT bounds, and deadline misses are not schedulability guarantees. The thesis will state its predictability claims within that limit.
+Observed maximum response times are not WCRT bounds, and the absence of observed deadline misses is not a schedulability guarantee. Any analytical guarantees will be stated within the assumptions and scope of the analysis.
 
 \section{Privacy and ethics}
 The document is required to provide in the introduction chapter a specific section with information on how privacy and ethics were considered in the analysis and development of the work. If not applicable, this should be justified.  Without this section, the document will not be evaluated.
