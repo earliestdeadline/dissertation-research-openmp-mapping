@@ -22,6 +22,11 @@ Safety-critical domains, such as automotive, have traditionally favoured static 
 
 In static approaches, task placement is decided before execution, which makes the arrangement known and analysable. In dynamic approaches, the runtime decides placement while the application runs. This can respond to the work actually present, but is harder to bound in advance. The expectation that static mapping is always more predictable has been challenged on CPUs. In OpenMP experiments on an NVIDIA Jetson AGX Xavier, dynamic mapping gave lower response time and variability than a recorded static mapping for DAGs with dependencies, while the two performed alike for independent tasks \parencite{Samadi2024StaticDynamic}. The static variant there replays a schedule recorded from a dynamic run, not an analytically optimised allocation, and the study covered one application on the CPU only. Whether the same holds for accelerator offloading has not been established \parencite{Samadi2026Accelerator}.
 
+\subsection{Digital twins for HPC and heterogeneous platforms}
+\label{sec:chap1_digital_twins}
+
+A digital twin (DT) is a virtual representation of a physical system that stays linked to it through monitoring data and combines that data with models and simulation of the system's behaviour \parencite{Maiterth2025SRAPS,Kammeyer2025Thesis}. A common decomposition separates the data collected from one real system, the models of its expected behaviour, and the link between the two \parencite{Kammeyer2025Thesis}. In high-performance computing (HPC), this allows scheduling and configuration changes to be tested in simulation before they are applied, without disturbing the production system or running real jobs \parencite{Maiterth2025SRAPS,Kammeyer2025DTMeasure}. Existing HPC digital twins have mainly addressed power, energy and cooling. The scheduling extension of the ExaDigiT twin replays and reschedules job traces from production supercomputers, including systems with CPU and GPU partitions, to study their effect on power and cooling \parencite{Maiterth2025SRAPS}. A twin of a cluster with heterogeneous node types has been used for energy-, cost- and emission-aware scheduling and for power capping \parencite{Kammeyer2023DTFramework,Kammeyer2025DTMeasure,Kammeyer2025Thesis}. These twins model whole jobs placed on nodes, and they report timing only as queue-level metrics such as waiting and turnaround time; the scheduling model of \textcite{Kammeyer2025Thesis} does not support deadlines. In the works reviewed so far, digital twins have not been applied to the timing analysis of task mapping on heterogeneous CPU and GPU platforms, which is the direction proposed in this thesis.
+
 \subsection{Related work in brief}
 \label{sec:chap1_related_brief}
 
@@ -32,11 +37,12 @@ Several works address this problem from complementary directions. \textcite{Mela
 
 Task mapping decides where and when ready tasks run. For OpenMP applications that offload work to GPUs, it also determines how device queues are filled, and therefore response time and its variation \parencite{Samadi2026Accelerator}. Heuristic mapping has been studied for CPU threads \parencite{Samadi2024TaskToThread} and, in simulation, for single DAGs on accelerators \parencite{Samadi2026Accelerator}. In the sources reviewed so far, concurrent DAGs on heterogeneous OpenMP platforms receive little direct evidence. The accelerator method evaluates single DAGs and mentions that multiple DAGs could be considered only if executed sequentially \parencite{Samadi2026Accelerator}, and the group's CPU-only multi-DAG analysis found very low schedulability \parencite{Samadi2026Schedulability}.
 
-The thesis therefore treats three gaps as working hypotheses to test, not as established absences:
+The thesis therefore treats four gaps as working hypotheses to test, not as established absences:
 \begin{enumerate}
   \item \textbf{G1:} concurrently released OpenMP target-task DAGs, mapped to heterogeneous CPU and GPU resources and measured on hardware for response time and variability;
   \item \textbf{G2:} real-hardware evaluation of a candidate accelerator mapping on high-workload AI and computer-vision-style applications;
-  \item \textbf{G3:} a comparison of static and dynamic accelerator mapping, including its overhead, which has been studied for CPU threads \parencite{Samadi2024StaticDynamic} but not for accelerators.
+  \item \textbf{G3:} a comparison of static and dynamic accelerator mapping, including its overhead, which has been studied for CPU threads \parencite{Samadi2024StaticDynamic} but not for accelerators;
+  \item \textbf{G4:} a digital twin of a heterogeneous CPU and GPU platform for the timing analysis of task mapping, whereas existing HPC digital twins target power, energy and cooling \parencite{Maiterth2025SRAPS,Kammeyer2025Thesis}.
 \end{enumerate}
 The search is bounded. Contrary evidence exists for concurrent computer-vision and DNN workloads \parencite{Yang2018OpenVX,Dagli2024HaXCoNN} and for OpenMP GPU execution on embedded and HPC platforms \parencite{Yu2024OpenMPGPUGraph}, so the thesis must position itself narrowly, within OpenMP and accelerator mapping.
 
@@ -49,6 +55,7 @@ The goal is to determine whether a predictable task-to-accelerator mapping for O
 \begin{enumerate}
   \item review and map the state of the art on mapping, scheduling and GPU offloading, with explicit screening criteria;
   \item implement or adapt a candidate heuristic family on an available platform, verifying correctness before measurement;
+  \item develop a digital twin of the target platform, in which timing data collected on the hardware calibrates a simulation model of the mapping, use it to evaluate candidate mappings and configurations before deployment, apply the selected mapping to the runtime, and compare the twin's predictions with hardware measurements;
   \item evaluate it under concurrent DAG release and against static and dynamic variants, reporting observed maxima, variability and mapping overhead;
   \item investigate the schedulability of the implemented mapping, stating its assumptions and limitations for the CPU and GPU workloads considered;
   \item report what the measurements show and do not show, separating empirical observations from analytical guarantees.
@@ -61,6 +68,7 @@ The goal is to determine whether a predictable task-to-accelerator mapping for O
   \item \textbf{RQ1 (G1):} How does the response time of several concurrently released OpenMP target-task DAGs change under a candidate heuristic mapping, compared with a baseline?
   \item \textbf{RQ2 (G2):} Do the candidate heuristics keep their simulated advantage when run on real hardware with AI and computer-vision-style workloads?
   \item \textbf{RQ3 (G3):} How do static and dynamic accelerator mapping compare in response-time variability and mapping overhead?
+  \item \textbf{RQ4 (G4):} How closely do the response times predicted by a digital twin of the heterogeneous platform match those measured on hardware, and does applying the mapping selected in the twin reduce observed response time and its variability compared with a baseline?
 \end{enumerate}
 
 Observed maximum response times are not WCRT bounds, and the absence of observed deadline misses is not a schedulability guarantee. Any analytical guarantees will be stated within the assumptions and scope of the analysis.
