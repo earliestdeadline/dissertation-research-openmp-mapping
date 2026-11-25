@@ -51,7 +51,7 @@ Platform choice is itself an open problem. The candidate method was evaluated by
 \section{Goal and objectives}
 \label{sec:chap1_goal}
 
-The goal is to determine whether a predictable task-to-accelerator mapping for OpenMP applications on heterogeneous CPU and GPU platforms can be implemented and evaluated on high-workload applications, and how its mapping choices affect response time, its variability and schedulability. The objectives are to:
+The goal is to determine whether a predictable task-to-accelerator mapping for OpenMP applications on heterogeneous CPU and GPU platforms can be implemented and evaluated on high-workload applications, assess is whether it keeps or improves predictability on real hardware, and how its mapping choices affect response time aswell as its variability and schedulability. The objectives are to:
 \begin{enumerate}
   \item review and map the state of the art on mapping, scheduling and GPU offloading, with explicit screening criteria;
   \item implement or adapt a candidate heuristic family on an available platform, verifying correctness before measurement;
@@ -105,9 +105,8 @@ The following tables provide an example of summary tables that can be included i
     Application                  & Model                    & Version                           \\
     \midrule
     ChatGPT (via chatgpt.com)    & GPT-6 Luna                   & Several versions since 2026-10-26 \\
-    GitHub Copilot (via VS Code) & Claude Opus 5.5            & Several versions since 2026-10-26                            \\
+    Claude Code (via VSCode) & Claude Opus 5.5            & Several versions since 2026-10-26                            \\
     Overleaf & Internal Overleaf Model          & Several versions since 2026-11-09                        \\
-    Claude Code (via VS Code) & Claude Opus 5.5 & 2026-11-22                        \\
     \bottomrule
   \end{tabularx}
 \end{table}
