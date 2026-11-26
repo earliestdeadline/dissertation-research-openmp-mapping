@@ -20,14 +20,14 @@ Safety-critical systems, such as those used in automotive industry, have traditi
 \subsection{Static and dynamic task mapping}
 \label{sec:chap1_static_dynamic}
 
-In real-time systems, task mapping consists of allocating tasks to computing resources and scheduling their execution on those resources. It can be performed statically or dynamically. In static mapping, the allocation of tasks is determined before execution, so it can be analysed in advance. In dynamic mapping, the runtime scheduler allocates tasks to computing resources during execution. This allows the system to adapt to the actual execution times of tasks and to balance the load across resources, but it makes the timing behaviour of the system harder to analyse in advance.
+In real-time systems, task mapping consists of allocating tasks to computing resources and scheduling their execution on those resources. It can be performed statically or dynamically. In static mapping, the allocation of tasks is determined before execution, so it can be analyzed in advance. In dynamic mapping, the runtime scheduler allocates tasks to computing resources during execution. This allows the system to adapt to the actual execution times of tasks and to balance the load across resources, but it makes the timing behavior of the system harder to analyze in advance.
 
-Static mapping is commonly considered more predictable than dynamic mapping \parencite{Melani2017StaticOpenMP,Samadi2024StaticDynamic}. However, this assumption has been questioned. In experiments with three OpenMP applications on an NVIDIA Jetson AGX Xavier, dynamic mapping achieved lower response time and lower variability than static mapping for the applications with data dependencies between tasks. For the application with independent tasks, both approaches performed similarly \parencite{Samadi2024StaticDynamic}. These experiments mapped tasks to CPU threads only. Whether the same holds when tasks are mapped to accelerators, such as GPUs, has not been established \parencite{Samadi2026Accelerator}.
+Static mapping is commonly considered more predictable than dynamic mapping \parencite{Melani2017StaticOpenMP,Samadi2024StaticDynamic}. However, this assumption has been questioned. In experiments with three OpenMP applications on an NVIDIA Jetson AGX Xavier, dynamic mapping achieved lower response time and lower variability than static mapping for the applications with data dependencies between tasks. For the application with independent tasks, both approaches performed similarly \parencite{Samadi2024StaticDynamic}. These experiments mapped tasks to CPU threads only. Whether the same holds when tasks are mapped to accelerators, such as GPUs, is yet to be established \parencite{Samadi2026Accelerator}.
 
 \subsection{Digital twins for HPC and heterogeneous platforms}
 \label{sec:chap1_digital_twins}
 
-A digital twin is a virtual representation of a physical system. It remains linked to that system through monitoring data, which it uses in models and simulations of the system's behaviour \parencite{Maiterth2025SRAPS,Kammeyer2025Thesis}. A digital twin is commonly divided into three parts: the data collected from the real system, the models of its expected behaviour, and the link between them, through which results obtained in simulation can be applied back to the real system \parencite{Kammeyer2025Thesis}.
+A digital twin is a virtual representation of a physical system. It remains linked to that system through monitoring data, which it uses in models and simulations of the system's behavior \parencite{Maiterth2025SRAPS,Kammeyer2025Thesis}. According to Kammeyer et. all, a digital twin is commonly divided into three parts. The first collects data from the real system, so that the twin reflects its current state. The second contains models that simulate how the system is expected to behave. The third links the two: measurements keep the models up to date, and decisions found in simulation can be applied back to the real system to improve the original's performance.
 
 In high-performance computing (HPC), digital twins allow scheduling and configuration changes to be tested in simulation before they are applied, without disturbing the production system \parencite{Maiterth2025SRAPS,Kammeyer2025DTMeasure}. Existing HPC digital twins have mainly addressed power, energy and cooling. \textcite{Maiterth2025SRAPS} extended the ExaDigiT digital twin with job scheduling and used it to study how scheduling policies affect the power consumption and cooling of production supercomputers, including systems with CPU and GPU partitions. \textcite{Kammeyer2025Thesis} developed a digital twin of a cluster with different node types and used it to schedule jobs according to energy price and carbon emissions, and to keep the cluster within a power limit \parencite{Kammeyer2023DTFramework,Kammeyer2025DTMeasure}.
 
@@ -36,21 +36,21 @@ These digital twins schedule whole jobs on compute nodes and consider timing onl
 \subsection{Related work in brief}
 \label{sec:chap1_related_brief}
 
-Several works address this problem from complementary directions. \textcite{Melani2017StaticOpenMP} proposed static allocation of OpenMP DAGs using an ILP reference and fast heuristics, but the evaluation is offline, single-DAG and CPU-only. \textcite{Samadi2024TaskToThread} introduced heuristic multi-queue task-to-thread mapping with an LLVM implementation, restricted to CPU threads. \textcite{Samadi2026Schedulability} analysed the schedulability of these mappings, but reported only single DAGs because schedulability for multiple DAGs was very low. \textcite{Serrano2018HeterogeneousRTA} derived an analytical response-time bound for a DAG with one offloaded node, but on a single accelerator. \textcite{Yang2018OpenVX} analysed six concurrent computer-vision DAGs on CPU and GPU with bounds and measurements, but without OpenMP. \textcite{Zou2023RTGPU} provide hard real-time analysis for multiple GPU applications with hardware validation, but use CUDA and chain-structured tasks. \textcite{Yu2024OpenMPGPUGraph} run OpenMP GPU graphs on H100 and Jetson Orin systems, but report throughput rather than predictability. \textcite{Dagli2024HaXCoNN} map concurrent DNNs onto the GPU and DLA of Jetson platforms, but their objective is throughput and latency rather than deadlines.
+Several works approached this problem from varied directions. \textcite{Melani2017StaticOpenMP} proposed static allocation of OpenMP DAGs using an ILP reference and fast heuristics, but the evaluation is offline, single-DAG and CPU-only. \textcite{Samadi2024TaskToThread} introduced heuristic multi-queue task-to-thread mapping with an LLVM implementation, restricted to CPU threads. \textcite{Samadi2026Schedulability} analysed the schedulability of these mappings, but reported only single DAGs because schedulability for multiple DAGs was very low. \textcite{Serrano2018HeterogeneousRTA} derived an analytical response-time bound for a DAG with one offloaded node, but on a single accelerator. \textcite{Yang2018OpenVX} analysed six concurrent computer-vision DAGs on both CPU and GPU executions with bounds and measurements, but without OpenMP. \textcite{Zou2023RTGPU} provide hard real-time analysis for multiple GPU applications with hardware validation, but use CUDA and chain-structured tasks. \textcite{Yu2024OpenMPGPUGraph} run OpenMP GPU graphs on H100 and Jetson Orin systems, but report throughput rather than predictability. \textcite{Dagli2024HaXCoNN} map concurrent DNNs onto the GPU and DLA of Jetson platforms, but their objective is throughput and latency rather than deadline correctness.
 
 \section{Problem statement and scope}
 \label{sec:chap1_problem}
 
-Task mapping decides where and when ready tasks run. For OpenMP applications that offload work to GPUs, it also determines how device queues are filled, and therefore response time and its variation \parencite{Samadi2026Accelerator}. Heuristic mapping has been studied for CPU threads \parencite{Samadi2024TaskToThread} and, in simulation, for single DAGs on accelerators \parencite{Samadi2026Accelerator}. In the sources reviewed so far, concurrent DAGs on heterogeneous OpenMP platforms receive little direct evidence. The accelerator method evaluates single DAGs and mentions that multiple DAGs could be considered only if executed sequentially \parencite{Samadi2026Accelerator}, and the group's CPU-only multi-DAG analysis found very low schedulability \parencite{Samadi2026Schedulability}.
+Task mapping decides where and when ready tasks run. For OpenMP applications that offload work to GPUs, it also determines how device queues are filled, and therefore response time and its variation \parencite{Samadi2026Accelerator}. Heuristic mapping has been studied for CPU threads \parencite{Samadi2024TaskToThread} and, in simulation, for single DAGs on accelerators \parencite{Samadi2026Accelerator}. In the sources reviewed so far, concurrent DAGs on heterogeneous OpenMP platforms are not very thoroughly investigated. The accelerator method evaluates single DAGs and mentions that multiple DAGs could be considered only if executed sequentially \parencite{Samadi2026Accelerator}, and the group's CPU-only multi-DAG analysis found very low schedulability \parencite{Samadi2026Schedulability}.
 
-The thesis therefore treats four gaps as working hypotheses to test, not as established absences:
+The thesis therefore delineates four gaps for research purposes:
 \begin{enumerate}
   \item \textbf{G1:} concurrently released OpenMP target-task DAGs, mapped to heterogeneous CPU and GPU resources and measured on hardware for response time and variability;
   \item \textbf{G2:} real-hardware evaluation of a candidate accelerator mapping on high-workload AI and computer-vision-style applications;
   \item \textbf{G3:} a comparison of static and dynamic accelerator mapping, including its overhead, which has been studied for CPU threads \parencite{Samadi2024StaticDynamic} but not for accelerators;
   \item \textbf{G4:} a digital twin of a heterogeneous CPU and GPU platform for the timing analysis of task mapping, whereas existing HPC digital twins target power, energy and cooling \parencite{Maiterth2025SRAPS,Kammeyer2025Thesis}.
 \end{enumerate}
-The search is bounded. Contrary evidence exists for concurrent computer-vision and DNN workloads \parencite{Yang2018OpenVX,Dagli2024HaXCoNN} and for OpenMP GPU execution on embedded and HPC platforms \parencite{Yu2024OpenMPGPUGraph}, so the thesis must position itself narrowly, within OpenMP and accelerator mapping.
+The search is bounded. Contrary evidence exists for concurrent computer-vision and CUDA workloads \parencite{Yang2018OpenVX,Dagli2024HaXCoNN} and for OpenMP GPU execution on embedded and HPC platforms \parencite{Yu2024OpenMPGPUGraph}, so the thesis must position itself narrowly, within OpenMP and accelerator mapping.
 
 Platform choice is itself an open problem. The candidate method was evaluated by simulation, using task times traced on a single-GPU embedded board, while its multi-GPU configurations are hypothetical \parencite{Samadi2026Accelerator}. On a single integrated GPU, the device-allocation phase has no real choice to make, whereas a multi-GPU node exercises all three phases. NVIDIA hardware is the likely target, but the board, GPU count and access are not confirmed. Embedded Jetson-class boards are the platform used in the group's earlier work \parencite{Samadi2024StaticDynamic} and in concurrent DNN studies \parencite{Dagli2024HaXCoNN}. A server-class node, such as the four-H100 accelerator node used by \textcite{Yu2024OpenMPGPUGraph}, gives more devices but may not be available. The choice affects both what can be tested and how results compare with the literature.
 
@@ -63,8 +63,7 @@ The goal is to determine whether a predictable task-to-accelerator mapping for O
   \item implement or adapt a candidate heuristic family on an available platform, verifying correctness before measurement;
   \item develop a digital twin of the target platform, in which timing data collected on the hardware calibrates a simulation model of the mapping, use it to evaluate candidate mappings and configurations before deployment, apply the selected mapping to the runtime, and compare the twin's predictions with hardware measurements;
   \item evaluate it under concurrent DAG release and against static and dynamic variants, reporting observed maxima, variability and mapping overhead;
-  \item investigate the schedulability of the implemented mapping, stating its assumptions and limitations for the CPU and GPU workloads considered;
-  \item report what the measurements show and do not show, separating empirical observations from analytical guarantees.
+  \item investigate the schedulability of the implemented mapping, stating its assumptions and limitations for the CPU and GPU workloads considered.
 \end{enumerate}
 
 \section{Research questions}
@@ -94,54 +93,46 @@ This work does not involve human participants and does not collect or process pe
 
 \section{Use of AI tools}
 \label{sec:chap1_ai}
-The dissertation course uses the model of limited use with declaration of use and intentions \parencite{oliveira2025}. AI tools can be used, under supervision, to support the development of the work, such as idea generation, topic organization, document structure, brainstorming and linguistic revision. All content needs to be revised, and the author needs to add a statement taking full responsibility for the work.
-
-Direct use of content generated from AI tools is not allowed, unless the content itself is intended to be part of some experimental analysis, and clearly identified as so.
-
-The document is required to provide in the introduction chapter a specific section with information on which AI tools were used, for what purpose, and in which sections of the document. If no AI tools were used, the author should declare it in this section. Without this section, the dissertation will not be evaluated.
-
-The following tables provide an example of summary tables that can be included in such section. These are mock-up examples, do not consider them as guidelines or recommendations.
+This dissertation follows the model of limited use of AI tools with declaration of use and intentions \parencite{oliveira2025}. AI tools were used for document gathering, research assistance, formatting, assistance in technical writing and reviewing. Table~\ref{tab:ai-tools} lists the tools used, and Table~\ref{tab:ai-purpose} describes the purpose of use and the sections concerned. All AI-assisted content was reviewed and revised by the author, who takes full responsibility for the work presented in this document.
 
 \begin{table}[htbp]
   \centering
   \caption{AI tools used}
   \label{tab:ai-tools}
-  \begin{tabularx}{\textwidth}{l l l}
+  \begin{tabularx}{\textwidth}{l l X}
     \toprule
-    Application                  & Model                    & Version                           \\
+    Application              & Model           & Version                           \\
     \midrule
-    ChatGPT (via chatgpt.com)    & GPT-6 Luna                   & Several versions since 2026-10-26 \\
-    Claude Code (via VSCode) & Claude Opus 5.5            & Several versions since 2026-10-26                            \\
-    Overleaf & Internal Overleaf Model          & Several versions since 2026-11-09                        \\
+    Claude Code (via VS Code) & Claude Opus 5.5 & Several versions since 2026-10-26 \\
+    Overleaf & Internal Overleaf model & Several versions since 2026-11-09 \\
     \bottomrule
   \end{tabularx}
 \end{table}
+
+\pagebreak
 
 \begin{table}[htbp]
   \centering
   \caption{Purpose of use}
   \label{tab:ai-purpose}
-  \begin{tabularx}{\textwidth}{l X}
+  \begin{tabularx}{\textwidth}{l l X}
     \toprule
-    Chapter/Section     & Purpose                                                                                                                                                                                                          \\
+    Purpose                         & Section(s)                  & Description \\
     \midrule
-    Introduction        &
-    Research questions were brainstormed with the model. The final version is the result of the author's critical analysis of the brainstorm.                                                                                              \\
+    Document gathering              & Introduction                &
+    Searching for and retrieving related works, screening them for relevance, and checking their bibliographic metadata. \\
 
-    State of the Art    &
-    State of the art was brainstormed with models. Following an initial list of references identified by the author using the PRISMA method, models were used to screen and prioritise references, and identify related and missing works. \\
+    Research assistance             & Introduction                &
+    Summarising and comparing related works to check for relevance.\\
 
-    State of the Art    &
-    The structure of the state of the art chapter was initially brainstormed with models, but was later evolved and changed during the writing.                                                                                            \\
+    Assistance in technical writing & Introduction                &
+    Suggesting wording, terminology and paragraph structure. All text was reviewed and revised by the author. \\
 
-    All                 &
-    Models were used to propose grammar corrections and text simplification.                                                                                                                                                               \\
+    Formatting                      & Introduction, Bibliography  &
+    Correcting LaTeX citation commands, bibliography entries and cross-references. \\
 
-    All                 &
-    Claude Opus 5.5 via GitHub Copilot was used for document gathering, general research, and checking document cross-references.                                                                                                         \\
-
-    Introduction        &
-    Claude Opus 5.5 via Claude Code was used to check and correct the LaTeX citation commands and their formatting. All changes were reviewed by the author.                                                                                \\
+    Reviewing                       & Introduction                &
+    Reviewing the text for clarity, terminology, consistency and citation support. \\
     \bottomrule
   \end{tabularx}
 \end{table}
