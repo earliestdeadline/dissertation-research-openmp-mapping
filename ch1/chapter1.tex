@@ -48,7 +48,7 @@ The thesis therefore delineates four gaps for research purposes:
   \item \textbf{G1:} concurrently released OpenMP target-task DAGs, mapped to heterogeneous CPU and GPU resources and measured on hardware for response time and variability;
   \item \textbf{G2:} real-hardware evaluation of a candidate accelerator mapping on high-workload AI and computer-vision-style applications;
   \item \textbf{G3:} a comparison of static and dynamic accelerator mapping, including its overhead, which has been studied for CPU threads \parencite{Samadi2024StaticDynamic} but not for accelerators;
-  \item \textbf{G4:} a digital twin of a heterogeneous CPU and GPU platform for the timing analysis of task mapping, whereas existing HPC digital twins target power, energy and cooling \parencite{Maiterth2025SRAPS,Kammeyer2025Thesis}.
+  \item \textbf{G4:} assess the viability of a digital twin of a heterogeneous CPU and GPU platform for the timing analysis of task mapping \parencite{Maiterth2025SRAPS,Kammeyer2025Thesis}.
 \end{enumerate}
 The search is bounded. Contrary evidence exists for concurrent computer-vision and CUDA workloads \parencite{Yang2018OpenVX,Dagli2024HaXCoNN} and for OpenMP GPU execution on embedded and HPC platforms \parencite{Yu2024OpenMPGPUGraph}, so the thesis must position itself narrowly, within OpenMP and accelerator mapping.
 
@@ -73,7 +73,7 @@ The goal is to determine whether a predictable task-to-accelerator mapping for O
   \item \textbf{RQ1 (G1):} How does the response time of several concurrently released OpenMP target-task DAGs change under a candidate heuristic mapping, compared with a baseline?
   \item \textbf{RQ2 (G2):} Do the candidate heuristics keep their simulated advantage when run on real hardware with AI and computer-vision-style workloads?
   \item \textbf{RQ3 (G3):} How do static and dynamic accelerator mapping compare in response-time variability and mapping overhead?
-  \item \textbf{RQ4 (G4):} How closely do the response times predicted by a digital twin of the heterogeneous platform match those measured on hardware, and does applying the mapping selected in the twin reduce observed response time and its variability compared with a baseline?
+  \item \textbf{RQ4 (G4):} How closely can a calibrated digital twin of the heterogeneous platform match the response times and behaviour measured on hardware, and does applying the mapping selected in the twin reduce observed response time and its variability compared with a baseline?
 \end{enumerate}
 
 Observed maximum response times are not WCRT bounds, and the absence of observed deadline misses is not a schedulability guarantee. Any analytical guarantees will be stated within the assumptions and scope of the analysis.
