@@ -31,7 +31,7 @@ A digital twin is a virtual representation of a physical system. It remains link
 
 In high-performance computing (HPC), digital twins allow scheduling and configuration changes to be tested in simulation before they are applied, without disturbing the production system \parencite{Maiterth2025SRAPS,Kammeyer2025DTMeasure}. Existing HPC digital twins have mainly addressed power, energy and cooling. \textcite{Maiterth2025SRAPS} extended the ExaDigiT digital twin with job scheduling and used it to study how scheduling policies affect the power consumption and cooling of production supercomputers, including systems with CPU and GPU partitions. \textcite{Kammeyer2025Thesis} developed a digital twin of a cluster with different node types and used it to schedule jobs according to energy price and carbon emissions, and to keep the cluster within a power limit \parencite{Kammeyer2023DTFramework,Kammeyer2025DTMeasure}.
 
-These digital twins schedule whole jobs on compute nodes and consider timing only through average metrics, such as waiting time and turnaround time. The scheduling model of \textcite{Kammeyer2025Thesis} does not support deadlines. In the works reviewed so far, digital twins have not been used to analyse the timing behaviour of task mapping on heterogeneous CPU and GPU platforms.
+These digital twins schedule whole jobs on compute nodes and consider timing only through average metrics, such as waiting time and turnaround time. The scheduling model of \textcite{Kammeyer2025Thesis} does not support deadlines. 
 
 \subsection{Related work in brief}
 \label{sec:chap1_related_brief}
@@ -41,29 +41,28 @@ Several works approached this problem from varied directions. \textcite{Melani20
 \section{Problem statement and scope}
 \label{sec:chap1_problem}
 
-Task mapping decides where and when ready tasks run. For OpenMP applications that offload work to GPUs, it also determines how device queues are filled, and therefore response time and its variation \parencite{Samadi2026Accelerator}. Heuristic mapping has been studied for CPU threads \parencite{Samadi2024TaskToThread} and, in simulation, for single DAGs on accelerators \parencite{Samadi2026Accelerator}. In the sources reviewed so far, concurrent DAGs on heterogeneous OpenMP platforms are not very thoroughly investigated. The accelerator method evaluates single DAGs and mentions that multiple DAGs could be considered if executed sequentially \parencite{Samadi2026Accelerator}, and the group's CPU-only multi-DAG analysis found very low schedulability \parencite{Samadi2026Schedulability}.
+Task mapping decides where and when ready tasks run. For parallel applications that offload work to GPUs, it also determines how device queues are filled, and therefore response times and their variation \parencite{Samadi2026Accelerator}. Heuristic mapping has been studied for CPU threads \parencite{Samadi2024TaskToThread} and, in simulation, for single DAGs on accelerators \parencite{Samadi2026Accelerator}. In the sources reviewed so far, concurrent DAGs on heterogeneous OpenMP platforms are not very thoroughly investigated. The accelerator method evaluates single DAGs and mentions that multiple DAGs could be considered if executed sequentially \parencite{Samadi2026Accelerator}, and the group's CPU-only multi-DAG analysis found very low schedulability \parencite{Samadi2026Schedulability}.
 
 The thesis therefore delineates four gaps for research purposes:
 \begin{enumerate}
-  \item \textbf{G1:} concurrently released OpenMP target-task DAGs, mapped to heterogeneous CPU and GPU resources and measured on hardware for response time and variability;
+  \item \textbf{G1:} concurrently released task allocations, mapped to heterogeneous CPU and GPU resources and measured on hardware for response time and variability;
   \item \textbf{G2:} real-hardware evaluation of a candidate accelerator mapping on high-workload AI and computer-vision-style applications;
   \item \textbf{G3:} a comparison of static and dynamic accelerator mapping, including its overhead, which has been studied for CPU threads \parencite{Samadi2024StaticDynamic} but not for accelerators;
   \item \textbf{G4:} assess the viability of a digital twin of a heterogeneous CPU and GPU platform for the timing analysis of task mapping \parencite{Maiterth2025SRAPS,Kammeyer2025Thesis}.
 \end{enumerate}
-The search is bounded.
 
 Platform choice is itself an open problem. The candidate method was evaluated by simulation, using task times traced on an embedded board, while its multi-GPU configurations are hypothetical \parencite{Samadi2026Accelerator}. On a single GPU, the device-allocation phase has no real choice to make, whereas a multi-GPU node exercises all three phases. NVIDIA hardware is the likely target, but the board, GPU count and access are not confirmed. Embedded Jetson-class boards are the platform used in the group's earlier work \parencite{Samadi2024StaticDynamic}. A server-class node gives more devices but may not be available. The choice affects both what can be tested and how results compare with the literature.
 
 \section{Goal and objectives}
 \label{sec:chap1_goal}
 
-The goal is to determine whether a predictable task-to-accelerator mapping for OpenMP applications on heterogeneous CPU and GPU platforms can be implemented and evaluated on high-workload applications, assess is whether it keeps or improves predictability on real hardware, and how its mapping choices affect response time aswell as its variability and schedulability. The objectives are to:
+The goal is to determine whether a predictable task-to-accelerator mapping for OpenMP applications on heterogeneous CPU and GPU platforms can be developed and evaluated on high-workload applications, whether it keeps or improves predictability on real hardware, and how its mapping choices affect response time aswell as its variability and schedulability. The objectives are to:
 \begin{enumerate}
   \item review and map the state of the art on mapping, scheduling and GPU offloading, with explicit screening criteria;
   \item develop or adapt a candidate heuristic family on an available platform, verifying correctness before measurement;
-  \item develop a digital twin of the target platform, in which timing data collected on the hardware calibrates a simulation model of the mapping, use it to evaluate candidate mappings and configurations before deployment, apply the selected mapping to the runtime, and compare the twin's predictions with hardware measurements;
   \item evaluate it under concurrent DAG release and against static and dynamic variants, reporting observed maxima, variability and mapping overhead;
   \item investigate the schedulability of the implemented mapping, stating its assumptions and limitations for the CPU and GPU workloads considered.
+  \item developing a digital twin of the target platform, in which timing data collected on the hardware calibrates a simulation model of the mapping, use it to evaluate candidate mappings and configurations before deployment, apply the selected mapping to the runtime, and compare the twin's predictions with hardware measurements;
 \end{enumerate}
 
 \section{Research questions}
